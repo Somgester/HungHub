@@ -1,9 +1,23 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
 
-export const  connectDB = async () =>{
-    await mongoose.connect('{ Add your mongodb URI Here }/food-del').then(()=>console.log("DB Connected"))
-}
+dotenv.config();
 
+const MONGO_URI = process.env.MONGO_URI;
 
-// add your mongoDB connection string above.
-// Do not use '@' symbol in your databse user's password else it will show an error.
+export const connectDB = async () => {
+    try {
+        await mongoose.connect(`${MONGO_URI}/food-del`);
+        console.log("MongoDB Connected ✅");
+    } catch (err) {
+        console.error(`MongoDB connection error: ${err.message}`);
+        process.exit(1);
+    }
+};
+
+mongoose.connection.on("error", (err) => {
+    console.log(`MongoDB connection error: ${err.message}`);
+});
+mongoose.connection.on("disconnected", () => {
+    console.log("MongoDB disconnected");
+});
